@@ -68,3 +68,4 @@ export async function createAnnouncement(input: {
 export async function deleteAnnouncement(id: string) {
   await deleteDoc(doc(getDb(), 'announcements', id))
 }
+

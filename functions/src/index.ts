@@ -147,3 +147,4 @@ export const getSystemSummary = functions.https.onCall(async (_data, context) =>
     timestamp: new Date().toISOString(),
   }
 })
+

@@ -85,3 +85,4 @@ export async function deleteSharedMaterial(material: SharedMaterial) {
   await deleteStoredFiles([material.storagePath])
   await deleteDoc(doc(getDb(), 'sharedMaterials', material.id))
 }
+

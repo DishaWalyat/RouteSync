@@ -397,3 +397,4 @@ erDiagram
 | **8. Real-Time Sync** | Open the application in two browser windows side by side. Add a lecture note in window A. | Firestore `onSnapshot` Streaming | Window B immediately displays the new lecture note without refreshing. |
 | **9. RBAC & Access Restrictions** | In `/settings` or `/admin`, use the Evaluator Role Switcher to toggle to **Teacher** then **Admin**. | Role-Based Access Control (RBAC) | Teacher Portal (`/teacher`) and Admin Portal (`/admin`) become accessible; unauthorized users are redirected. |
 | **10. Public Deployment** | Open the live Vercel HTTPS URL, navigate through deep links, test session persistence. | Production Vercel Edge Hosting | Application runs seamlessly with clean SPA client routing and cloud persistence. |
+
