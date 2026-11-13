@@ -100,7 +100,12 @@ export function RemindersPage() {
           {items.map((item) => {
             const due = !item.isCompleted && item.dateTime && item.dateTime < now
             return (
-              <article key={item.id} className={`rounded-2xl border bg-white px-4 py-3 ${due ? 'border-danger/40' : 'border-line'} ${item.isCompleted ? 'opacity-60' : ''}`}>
+              <article
+                key={item.id}
+                className={`rounded-3xl border bg-white p-5 shadow-xs transition hover:shadow-sm ${
+                  due ? 'border-danger/40 bg-rose-50/20' : 'border-line'
+                } ${item.isCompleted ? 'opacity-60 bg-paper/50' : ''}`}
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-medium">{item.title}</p>

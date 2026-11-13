@@ -1,15 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Sora", ui-sans-serif, sans-serif;
-  --font-display: "Newsreader", ui-serif, serif;
-  --color-paper: #f8f7f4;
-  --color-ink: #252432;
-  --color-muted: #858391;
-  --color-line: #eae8e5;
-  --color-accent: #8174c8;
-  --color-accent-soft: #efecfa;
-  --color-danger: #9a4038;
+  --font-sans: "Plus Jakarta Sans", "Sora", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Sora", sans-serif;
+  --color-paper: #FAF7F2;
+  --color-ink: #1B1829;
+  --color-muted: #7E7892;
+  --color-line: #EFECE6;
+  --color-accent: #FF6433;
+  --color-accent-soft: #FFF1EC;
+  --color-violet: #5B4BD8;
+  --color-violet-soft: #EEECFC;
+  --color-sunny: #FFC436;
+  --color-sunny-soft: #FFF9E6;
+  --color-pink: #FF4D88;
+  --color-pink-soft: #FFEBF2;
+  --color-sky: #4FA8FF;
+  --color-sky-soft: #EDF6FF;
+  --color-danger: #EF4444;
 }
 
 html,
@@ -34,5 +42,6 @@ select {
 }
 
 ::selection {
-  background: #efecfa;
+  background: #FFE8DF;
+  color: #1B1829;
 }

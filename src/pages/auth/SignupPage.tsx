@@ -20,21 +20,21 @@ export function SignupPage() {
     event.preventDefault()
     setError('')
     if (displayName.trim().length < 2) {
-      setError('Enter your name.')
+      setError('Enter your full name.')
       return
     }
     if (!email.includes('@')) {
-      setError('Enter a valid email.')
+      setError('Enter a valid institutional email.')
       return
     }
     if (password.length < 6) {
-      setError('Use at least 6 characters.')
+      setError('Password must be at least 6 characters.')
       return
     }
     setLoading(true)
     try {
       await signup(email.trim(), password, displayName.trim())
-      notify('Account created.')
+      notify('Account created successfully.')
       navigate('/')
     } catch (err) {
       const message = getErrorMessage(err, 'Could not create your account.')
@@ -48,35 +48,51 @@ export function SignupPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <h1 className="font-display text-3xl text-ink">Create your archive</h1>
-        <p className="mt-2 text-sm text-muted">Your memories stay private to your account.</p>
+        <h1 className="font-display text-3xl font-extrabold text-ink">Create Account</h1>
+        <p className="mt-2 text-sm text-muted">Join LifeLog to organize your academic coursework in the cloud.</p>
       </div>
       <div>
-        <Label htmlFor="name">Display name</Label>
-        <TextInput id="name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} />
+        <Label htmlFor="name">Full Name</Label>
+        <TextInput
+          id="name"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          placeholder="e.g. Alyssa Jones"
+          required
+        />
       </div>
       <div>
-        <Label htmlFor="email">Email</Label>
-        <TextInput id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+        <Label htmlFor="email">Email Address</Label>
+        <TextInput
+          id="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="alyssa@institution.edu"
+          required
+        />
       </div>
       <div>
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">Password (min. 6 characters)</Label>
         <TextInput
           id="password"
           type="password"
           autoComplete="new-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          placeholder="••••••••"
+          required
         />
       </div>
       <FieldError>{error}</FieldError>
       <Button type="submit" className="w-full" loading={loading}>
-        Create account
+        Create Free Account
       </Button>
-      <p className="text-sm text-muted">
+      <p className="text-center text-xs font-medium text-muted pt-1">
         Already have an account?{' '}
-        <Link to="/login" className="text-accent">
-          Sign in
+        <Link to="/login" className="font-bold text-[#FF6433] hover:underline">
+          Sign In
         </Link>
       </p>
     </form>

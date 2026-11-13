@@ -189,32 +189,73 @@ function Group({
   const data = useAcademic()
   return (
     <section>
-      <h2 className="mb-3 font-display text-2xl">{title}</h2>
-      {items.length === 0 ? <p className="text-sm text-muted">{empty}</p> : (
-        <div className="space-y-2">
-          {items.map((item) => (
-            <article key={item.id} className="rounded-2xl border border-line bg-white px-4 py-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-medium">{item.title}</p>
-                  <p className="mt-1 text-xs text-muted">
-                    {subjectName(data.subjects, item.subjectId)} · {item.deadline ? formatShortDate(item.deadline) : 'No deadline'}
-                  </p>
-                  {item.description && <p className="mt-2 text-sm text-muted">{item.description}</p>}
+      <h2 className="mb-3 font-display text-2xl font-bold text-ink">{title}</h2>
+      {items.length === 0 ? (
+        <p className="text-sm text-muted">{empty}</p>
+      ) : (
+        <div className="space-y-3">
+          {items.map((item) => {
+            const subject = data.subjects.find((s) => s.id === item.subjectId)
+            return (
+              <article
+                key={item.id}
+                className="rounded-3xl border border-line bg-white p-5 shadow-xs transition hover:shadow-sm"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className="rounded-full px-2.5 py-0.5 text-[10px] font-bold text-white"
+                        style={{ background: subject?.color || '#5B4BD8' }}
+                      >
+                        {subjectName(data.subjects, item.subjectId)}
+                      </span>
+                      <span className="text-xs text-muted font-medium">
+                        Due: {item.deadline ? formatShortDate(item.deadline) : 'No deadline'}
+                      </span>
+                    </div>
+                    <p className="text-base font-bold text-ink">{item.title}</p>
+                    {item.description && <p className="mt-1 text-sm text-muted leading-relaxed">{item.description}</p>}
+                  </div>
+                  <span
+                    className={`rounded-full px-3 py-0.5 text-xs font-bold uppercase ${
+                      item.priority === 'high'
+                        ? 'bg-rose-100 text-rose-700'
+                        : item.priority === 'medium'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {priorityLabel[item.priority]} Priority
+                  </span>
                 </div>
-                <span className={`rounded-md px-2 py-0.5 text-xs ${item.priority === 'high' ? 'bg-danger/10 text-danger' : item.priority === 'medium' ? 'bg-accent-soft text-accent' : 'bg-paper text-muted'}`}>
-                  {priorityLabel[item.priority]}
-                </span>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <SelectInput className="max-w-40" value={item.status} aria-label="Assignment status" onChange={(event) => onStatus(item, event.target.value as AssignmentStatus)}>
-                  {ASSIGNMENT_STATUSES.map((status) => <option key={status} value={status}>{statusLabel[status]}</option>)}
-                </SelectInput>
-                <Button variant="secondary" className="px-3 py-1.5" onClick={() => onEdit(item)}>Edit</Button>
-                <Button variant="ghost" onClick={() => onDelete(item)}>Delete</Button>
-              </div>
-            </article>
-          ))}
+                <div className="mt-4 flex flex-wrap items-center gap-2 pt-3 border-t border-line/60">
+                  <SelectInput
+                    className="max-w-44 text-xs font-semibold"
+                    value={item.status}
+                    aria-label="Assignment status"
+                    onChange={(event) => onStatus(item, event.target.value as AssignmentStatus)}
+                  >
+                    {ASSIGNMENT_STATUSES.map((status) => (
+                      <option key={status} value={status}>
+                        {statusLabel[status]}
+                      </option>
+                    ))}
+                  </SelectInput>
+                  <Button variant="secondary" className="px-3 py-1 text-xs" onClick={() => onEdit(item)}>
+                    Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="px-3 py-1 text-xs text-danger hover:text-danger"
+                    onClick={() => onDelete(item)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </article>
+            )
+          })}
         </div>
       )}
     </section>

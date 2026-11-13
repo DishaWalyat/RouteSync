@@ -1,11 +1,11 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
 
 const control =
-  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-muted/70 focus:border-accent'
+  'w-full rounded-2xl border border-line bg-white px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-muted/60 focus:border-[#5B4BD8] focus:ring-3 focus:ring-[#5B4BD8]/10 shadow-2xs'
 
 export function Label({ children, htmlFor }: { children: ReactNode; htmlFor?: string }) {
   return (
-    <label htmlFor={htmlFor} className="mb-1.5 block text-sm text-ink">
+    <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-semibold text-ink uppercase tracking-wider">
       {children}
     </label>
   )
@@ -25,5 +25,5 @@ export function SelectInput({ className = '', ...props }: SelectHTMLAttributes<H
 
 export function FieldError({ children }: { children?: string }) {
   if (!children) return null
-  return <p className="mt-1.5 text-xs text-danger">{children}</p>
+  return <p className="mt-1.5 text-xs font-medium text-danger">{children}</p>
 }

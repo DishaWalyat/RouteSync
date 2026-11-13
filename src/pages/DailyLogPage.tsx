@@ -193,7 +193,7 @@ export function DailyLogPage() {
               key={slot.id}
               lecture={lecture}
               subject={subjectName(data.subjects, slot.subjectId)}
-              color={subjectById(data.subjects, slot.subjectId)?.color || '#8174C8'}
+              color={subjectById(data.subjects, slot.subjectId)?.color || '#5B4BD8'}
               time={`${slot.startTime}–${slot.endTime}`}
               room={lecture?.room || slot.room}
               number={lecture?.lectureNumber || slot.lectureNumber}
@@ -208,7 +208,7 @@ export function DailyLogPage() {
               key={lecture.id}
               lecture={lecture}
               subject={subjectName(data.subjects, lecture.subjectId)}
-              color={subjectById(data.subjects, lecture.subjectId)?.color || '#8174C8'}
+              color={subjectById(data.subjects, lecture.subjectId)?.color || '#5B4BD8'}
               time={`${lecture.startTime}–${lecture.endTime}`}
               room={lecture.room}
               number={lecture.lectureNumber}
@@ -323,36 +323,70 @@ function LectureCard({
   onDelete?: () => void
 }) {
   const status = lecture?.attendanceStatus || 'unmarked'
+  const statusBadgeStyle =
+    status === 'attended'
+      ? 'bg-emerald-100 text-emerald-800'
+      : status === 'missed'
+      ? 'bg-rose-100 text-rose-700'
+      : status === 'cancelled'
+      ? 'bg-amber-100 text-amber-800'
+      : 'bg-paper text-muted'
+
   return (
-    <article className="rounded-2xl border border-line bg-white p-4">
+    <article className="rounded-3xl border border-line bg-white p-5 shadow-xs transition hover:shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="flex items-center gap-2 font-medium">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
+          <p className="flex items-center gap-2.5 font-bold text-ink">
+            <span className="h-3 w-3 rounded-full ring-2 ring-white shrink-0" style={{ background: color }} />
             {subject}
           </p>
-          <p className="mt-1 text-xs text-muted">
+          <p className="mt-1 text-xs text-muted font-medium">
             {time}
             {number ? ` · ${number}` : ''}
-            {room ? ` · ${room}` : ''}
+            {room ? ` · Room ${room}` : ''}
           </p>
         </div>
-        <span className="rounded-md bg-accent-soft px-2 py-0.5 text-xs text-accent">{labels[status]}</span>
+        <span className={`rounded-full px-3 py-0.5 text-xs font-bold ${statusBadgeStyle}`}>
+          {labels[status]}
+        </span>
       </div>
-      {lecture?.topic && <h3 className="mt-3 text-sm font-medium">{lecture.topic}</h3>}
-      {lecture?.description && <p className="mt-1 line-clamp-2 text-sm text-muted">{lecture.description}</p>}
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
-        {files > 0 && <span className="inline-flex items-center gap-1"><Paperclip size={13} />{files}</span>}
-        {lecture?.homework && <span className="rounded-md border border-line px-2 py-0.5">Homework</span>}
+      {lecture?.topic && <h3 className="mt-3 text-base font-bold text-ink">{lecture.topic}</h3>}
+      {lecture?.description && (
+        <p className="mt-1 line-clamp-2 text-sm text-muted leading-relaxed">{lecture.description}</p>
+      )}
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted font-medium">
+        {files > 0 && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 text-[#5B4BD8] px-2 py-0.5 font-semibold">
+            <Paperclip size={12} />
+            {files} file{files === 1 ? '' : 's'}
+          </span>
+        )}
+        {lecture?.homework && (
+          <span className="rounded-full bg-amber-50 text-amber-800 border border-amber-200/60 px-2 py-0.5 font-semibold">
+            Assignment
+          </span>
+        )}
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2 pt-2 border-t border-line/60">
         {(['attended', 'missed', 'cancelled'] as const).map((item) => (
-          <Button key={item} type="button" variant={status === item ? 'primary' : 'secondary'} className="px-3 py-1.5" onClick={() => onMark(item)}>
+          <Button
+            key={item}
+            type="button"
+            variant={status === item ? 'primary' : 'secondary'}
+            className="px-3 py-1 text-xs"
+            onClick={() => onMark(item)}
+          >
             {labels[item]}
           </Button>
         ))}
-        <Button type="button" variant="ghost" onClick={onEdit}>{lecture ? 'Edit' : 'Add notes'}</Button>
-        {onDelete && <Button type="button" variant="ghost" onClick={onDelete}>Delete</Button>}
+        <Button type="button" variant="ghost" className="px-3 py-1 text-xs" onClick={onEdit}>
+          {lecture ? 'Edit Notes' : 'Add Notes'}
+        </Button>
+        {onDelete && (
+          <Button type="button" variant="ghost" className="px-3 py-1 text-xs text-danger hover:text-danger" onClick={onDelete}>
+            Delete
+          </Button>
+        )}
       </div>
     </article>
   )

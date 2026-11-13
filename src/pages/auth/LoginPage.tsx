@@ -38,12 +38,20 @@ export function LoginPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <h1 className="font-display text-3xl text-ink">Welcome back</h1>
-        <p className="mt-2 text-sm text-muted">Sign in to your private archive.</p>
+        <h1 className="font-display text-3xl font-extrabold text-ink">Welcome back!</h1>
+        <p className="mt-2 text-sm text-muted">Sign in to access your coursework, notes, and timetable.</p>
       </div>
       <div>
-        <Label htmlFor="email">Email</Label>
-        <TextInput id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+        <Label htmlFor="email">Email Address</Label>
+        <TextInput
+          id="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="student@institution.edu"
+          required
+        />
       </div>
       <div>
         <Label htmlFor="password">Password</Label>
@@ -53,18 +61,20 @@ export function LoginPage() {
           autoComplete="current-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          placeholder="••••••••"
+          required
         />
       </div>
       <FieldError>{error}</FieldError>
       <Button type="submit" className="w-full" loading={loading}>
-        Sign in
+        Sign In
       </Button>
-      <div className="flex justify-between text-sm">
-        <Link to="/forgot-password" className="text-accent">
-          Forgot password
+      <div className="flex items-center justify-between text-xs font-semibold pt-1">
+        <Link to="/forgot-password" className="text-[#5B4BD8] hover:underline">
+          Forgot password?
         </Link>
-        <Link to="/signup" className="text-muted">
-          Create account
+        <Link to="/signup" className="text-[#FF6433] hover:underline">
+          Create an Account
         </Link>
       </div>
     </form>

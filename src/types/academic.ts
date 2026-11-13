@@ -1,4 +1,13 @@
-export const SUBJECT_COLORS = ['#8174C8', '#6E8B74', '#C48B6A', '#5E87A8', '#A86B84', '#8A7A62'] as const
+export const SUBJECT_COLORS = [
+  '#FFC436', // Sunny Golden Yellow (Image 1 & 2 & 3)
+  '#FF4D88', // Hot Pink / Magenta (Image 1 & 3)
+  '#5B4BD8', // Electric Royal Violet (Image 1 & 3)
+  '#4FA8FF', // Sky Blue (Image 1 & 3)
+  '#FF6433', // Warm Punchy Coral (Image 1 & 2)
+  '#10B981', // Emerald Mint Green (Image 1)
+  '#8B5CF6', // Lavender Purple
+  '#2C264D', // Midnight Navy Indigo (Image 2 & 3)
+] as const
 
 export const ATTENDANCE = ['unmarked', 'attended', 'missed', 'cancelled'] as const
 export type AttendanceStatus = (typeof ATTENDANCE)[number]
