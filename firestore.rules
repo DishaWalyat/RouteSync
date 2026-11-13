@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Role detection via custom claims or persistent Firestore profile
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.role == 'admin' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         getUserData().role == 'admin')
+      );
+    }
+
+    function isTeacher() {
+      return isSignedIn() && (
+        request.auth.token.role == 'teacher' ||
+        isAdmin() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         getUserData().role == 'teacher')
+      );
+    }
+
+    // User Profile Documents
+    match /users/{userId} {
+      // Any authenticated user can read profiles for directory/collaboration; admins can read all
+      allow read: if isSignedIn();
+
+      // On registration, role must default to 'student' unless written by an admin
+      allow create: if isSignedIn() && (
+        (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role == 'student')) ||
+        isAdmin()
+      );
+
+      // On update, user cannot elevate their own role. Only admin can modify role field.
+      allow update: if (
+        isOwner(userId) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'email']))
+      ) || isAdmin();
+
+      allow delete: if isAdmin();
+
+      // Subcollections belonging to user: lectures, subjects, timetable, materials, units, topics, assignments, reminders
+      match /{subcollection}/{docId} {
+        allow read: if isOwner(userId) || isTeacher() || isAdmin();
+        allow write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Shared Campus & Class Announcements
+    match /announcements/{announcementId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isTeacher() || isAdmin();
+    }
+
+    // Shared Course Materials (PPT/PDF/Docs published by faculty)
+    match /sharedMaterials/{materialId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isTeacher() || isAdmin();
+    }
+
+    // Academic System Configuration
+    match /systemConfig/{configId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
