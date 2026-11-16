@@ -23,7 +23,14 @@ export function SelectInput({ className = '', ...props }: SelectHTMLAttributes<H
   return <select className={`${control} ${className}`} {...props} />
 }
 
-export function FieldError({ children }: { children?: string }) {
-  if (!children) return null
-  return <p className="mt-1.5 text-xs font-medium text-danger">{children}</p>
+export function FieldError({
+  children,
+  message,
+}: {
+  children?: ReactNode
+  message?: string | null
+}) {
+  const content = children ?? message
+  if (!content) return null
+  return <p className="mt-1.5 text-xs font-medium text-danger">{content}</p>
 }

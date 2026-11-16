@@ -2,8 +2,8 @@ export function SetupPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-lg items-center px-5 py-16">
       <div>
-        <p className="font-display text-4xl text-ink">LifeLog</p>
-        <h1 className="mt-4 text-lg text-ink">Firebase isn’t configured yet</h1>
+        <p className="font-display text-4xl font-extrabold text-ink">RouteSync</p>
+        <h1 className="mt-4 text-lg font-bold text-ink">Firebase isn’t configured yet</h1>
         <p className="mt-2 text-sm leading-6 text-muted">
           Copy <code>.env.example</code> to <code>.env</code> and add the web app keys from your Firebase project. Then restart the dev server.
         </p>

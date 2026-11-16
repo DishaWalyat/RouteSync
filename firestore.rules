@@ -24,57 +24,97 @@ service cloud.firestore {
       );
     }
 
-    function isTeacher() {
+    function isManufacturer() {
       return isSignedIn() && (
-        request.auth.token.role == 'teacher' ||
         isAdmin() ||
+        request.auth.token.role == 'manufacturer' ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-         getUserData().role == 'teacher')
+         getUserData().role == 'manufacturer')
       );
     }
 
     // User Profile Documents
     match /users/{userId} {
-      // Any authenticated user can read profiles for directory/collaboration; admins can read all
+      // Authenticated participants can view user directory
       allow read: if isSignedIn();
 
-      // On registration, role must default to 'student' unless written by an admin
+      // On registration, role must not be admin unless written by admin
       allow create: if isSignedIn() && (
-        (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role == 'student')) ||
+        (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role != 'admin')) ||
         isAdmin()
       );
 
-      // On update, user cannot elevate their own role. Only admin can modify role field.
+      // On update, users cannot elevate their own role to admin
       allow update: if (
         isOwner(userId) &&
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'email']))
       ) || isAdmin();
 
       allow delete: if isAdmin();
+    }
 
-      // Subcollections belonging to user: lectures, subjects, timetable, materials, units, topics, assignments, reminders
-      match /{subcollection}/{docId} {
-        allow read: if isOwner(userId) || isTeacher() || isAdmin();
-        allow write: if isOwner(userId) || isAdmin();
+    // Multi-tenant Supply Chain Shipments
+    match /shipments/{shipmentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
+
+      // Append-Only Tracking Events subcollection (Chain of Custody)
+      match /events/{eventId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+        // Strict tamper-evident audit: historical events cannot be modified or deleted
+        allow update, delete: if false;
       }
     }
 
-    // Shared Campus & Class Announcements
-    match /announcements/{announcementId} {
+    // Root shipmentEvents (for global chronological feeds)
+    match /shipmentEvents/{eventId} {
       allow read: if isSignedIn();
-      allow create, update, delete: if isTeacher() || isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if false;
     }
 
-    // Shared Course Materials (PPT/PDF/Docs published by faculty)
-    match /sharedMaterials/{materialId} {
+    // Products Catalog
+    match /products/{productId} {
       allow read: if isSignedIn();
-      allow create, update, delete: if isTeacher() || isAdmin();
+      allow create, update: if isSignedIn();
+      allow delete: if isAdmin() || isManufacturer();
     }
 
-    // Academic System Configuration
-    match /systemConfig/{configId} {
+    // Warehouse Inventory
+    match /inventory/{inventoryId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      // Strict negative inventory prevention enforced at database layer!
+      allow create, update: if isSignedIn() &&
+        (!('availableQuantity' in request.resource.data) || request.resource.data.availableQuantity >= 0);
+      allow delete: if isAdmin();
+    }
+
+    // Inventory Audit Logs (Append-Only)
+    match /inventoryAuditLogs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+
+    // Shipment Documents Metadata
+    match /shipmentDocuments/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.uploadedByUid == request.auth.uid);
+    }
+
+    // Delivery Tasks & Checkpoints
+    match /deliveryTasks/{taskId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Notifications & Broadcast Alerts
+    match /notifications/{notificationId} {
+      allow read, write: if isSignedIn();
     }
   }
 }

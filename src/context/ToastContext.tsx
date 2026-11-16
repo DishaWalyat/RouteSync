@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 
-type Tone = 'success' | 'error'
+type Tone = 'success' | 'error' | 'info'
 
 type Toast = {
   id: string

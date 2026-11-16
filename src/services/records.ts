@@ -9,11 +9,56 @@ import {
   serverTimestamp,
   updateDoc,
   where,
+  type QueryConstraint,
 } from 'firebase/firestore'
 import { getDb } from './firebase.ts'
 
+export function rootCollection(name: string) {
+  return collection(getDb(), name)
+}
+
 export function userCollection(uid: string, name: string) {
   return collection(getDb(), 'users', uid, name)
+}
+
+export function watchRootRecords<T>(
+  name: string,
+  mapRow: (id: string, data: Record<string, unknown>) => T,
+  onData: (rows: T[]) => void,
+  onError: (error: Error) => void,
+  constraints: QueryConstraint[] = [],
+) {
+  const q = constraints.length > 0 ? query(rootCollection(name), ...constraints) : rootCollection(name)
+  return onSnapshot(
+    q,
+    (snapshot) => onData(snapshot.docs.map((item) => mapRow(item.id, item.data() as Record<string, unknown>))),
+    (error) => onError(error),
+  )
+}
+
+export async function createRootRecord(name: string, data: Record<string, unknown>) {
+  const ref = await addDoc(rootCollection(name), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  })
+  return ref.id
+}
+
+export async function updateRootRecord(name: string, id: string, data: Record<string, unknown>) {
+  await updateDoc(doc(getDb(), name, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  })
+}
+
+export async function removeRootRecord(name: string, id: string) {
+  await deleteDoc(doc(getDb(), name, id))
+}
+
+export async function rootRecordsWhere(name: string, field: string, value: string) {
+  const snapshot = await getDocs(query(rootCollection(name), where(field, '==', value)))
+  return snapshot.docs
 }
 
 export function watchRecords<T>(

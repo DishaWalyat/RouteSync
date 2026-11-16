@@ -17,6 +17,17 @@ export async function uploadUserFile(uid: string, subjectId: string, file: File)
   return { storagePath: path, downloadURL, fileType: contentType, fileName: file.name, fileSize: file.size }
 }
 
+export async function uploadShipmentFile(shipmentId: string, file: File) {
+  const contentType = contentTypeFor(file.name)
+  if (!contentType) throw new Error('Use a PDF, PPT, PPTX, DOC, DOCX, JPG, PNG, or WEBP file.')
+  if (file.size > MAX_FILE_BYTES) throw new Error('Files must be under 20 MB.')
+  const path = `shipments/${shipmentId}/${crypto.randomUUID()}-${safeName(file.name)}`
+  const storageRef = ref(getFirebaseStorage(), path)
+  await uploadBytes(storageRef, file, { contentType })
+  const downloadURL = await getDownloadURL(storageRef)
+  return { storagePath: path, downloadURL, fileType: contentType, fileName: file.name, fileSize: file.size }
+}
+
 export async function uploadSharedFile(subjectId: string, file: File) {
   const contentType = contentTypeFor(file.name)
   if (!contentType) throw new Error('Use a PDF, PPT, PPTX, DOC, DOCX, JPG, PNG, or WEBP file.')

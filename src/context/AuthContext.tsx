@@ -9,11 +9,11 @@ import {
   logout,
   register,
   resetPassword,
-  updateAcademicProfile,
+  updateParticipantProfile,
   updateUserRole,
   watchAuth,
 } from '../services/auth.ts'
-import type { UserProfile, UserRole } from '../types/academic.ts'
+import type { UserProfile, UserRole } from '../types/supplyChain.ts'
 
 type AuthContextValue = {
   configured: boolean
@@ -21,15 +21,29 @@ type AuthContextValue = {
   profile: UserProfile | null
   role: UserRole
   isAdmin: boolean
-  isTeacher: boolean
-  isStudent: boolean
+  isManufacturer: boolean
+  isDistributor: boolean
+  isWarehouseManager: boolean
+  isTransporter: boolean
+  isRetailer: boolean
   isOnline: boolean
   loading: boolean
-  signup: (email: string, password: string, displayName: string) => Promise<void>
+  signup: (
+    email: string,
+    password: string,
+    displayName: string,
+    role?: UserRole,
+    organizationName?: string,
+  ) => Promise<void>
   signin: (email: string, password: string) => Promise<void>
   signout: () => Promise<void>
   sendReset: (email: string) => Promise<void>
-  saveProfile: (input: { displayName: string; semester: string; academicYear: string }) => Promise<void>
+  saveProfile: (input: {
+    displayName: string
+    organizationName: string
+    phone?: string
+    location?: string
+  }) => Promise<void>
   changeUserRole: (targetUid: string, newRole: UserRole) => Promise<void>
   setEvaluatorRole: (overrideRole: UserRole | null) => void
   evaluatorRole: UserRole | null
@@ -99,17 +113,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 1. Evaluator quick-switch mode (if explicitly set in UI for viva demonstration)
   // 2. Custom claim in Auth token (cryptographically signed by Firebase Auth server)
   // 3. User document profile role in Firestore
-  // 4. Default: 'student'
+  // 4. Default: 'transporter'
   const effectiveRole: UserRole = useMemo(() => {
     if (evaluatorRole) return evaluatorRole
     if (claimRole) return claimRole
     if (profile?.role) return profile.role
-    return 'student'
+    return 'transporter'
   }, [evaluatorRole, claimRole, profile?.role])
 
   const isAdmin = effectiveRole === 'admin'
-  const isTeacher = effectiveRole === 'teacher' || effectiveRole === 'admin'
-  const isStudent = effectiveRole === 'student'
+  const isManufacturer = effectiveRole === 'manufacturer' || effectiveRole === 'admin'
+  const isDistributor = false
+  const isWarehouseManager = effectiveRole === 'warehouse_manager' || effectiveRole === 'admin'
+  const isTransporter = effectiveRole === 'transporter' || effectiveRole === 'admin'
+  const isRetailer = effectiveRole === 'retailer' || effectiveRole === 'admin'
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -118,14 +135,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile,
       role: effectiveRole,
       isAdmin,
-      isTeacher,
-      isStudent,
+      isManufacturer,
+      isDistributor,
+      isWarehouseManager,
+      isTransporter,
+      isRetailer,
       isOnline,
       loading,
       evaluatorRole,
       setEvaluatorRole,
-      signup: async (email, password, displayName) => {
-        await register(email, password, displayName)
+      signup: async (email, password, displayName, role, organizationName) => {
+        await register(email, password, displayName, role, organizationName)
       },
       signin: async (email, password) => {
         await login(email, password)
@@ -139,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       saveProfile: async (input) => {
         if (!user) throw new Error('You need to be signed in.')
-        await updateAcademicProfile(user, input)
+        await updateParticipantProfile(user, input)
         await refreshProfile(user)
       },
       changeUserRole: async (targetUid, newRole) => {
@@ -151,7 +171,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       refreshProfile: () => refreshProfile(user),
     }),
-    [user, profile, effectiveRole, isAdmin, isTeacher, isStudent, isOnline, loading, evaluatorRole],
+    [
+      user,
+      profile,
+      effectiveRole,
+      isAdmin,
+      isManufacturer,
+      isDistributor,
+      isWarehouseManager,
+      isTransporter,
+      isRetailer,
+      isOnline,
+      loading,
+      evaluatorRole,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

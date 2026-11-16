@@ -1,3 +1,5 @@
+export * from './supplyChain.ts'
+
 export const SUBJECT_COLORS = [
   '#FFC436', // Sunny Golden Yellow (Image 1 & 2 & 3)
   '#FF4D88', // Hot Pink / Magenta (Image 1 & 3)

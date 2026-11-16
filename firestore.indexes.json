@@ -1,52 +1,53 @@
 {
   "indexes": [
     {
-      "collectionGroup": "lectures",
+      "collectionGroup": "shipments",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "subjectId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "DESCENDING" }
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "dispatchDate", "order": "DESCENDING" }
       ]
     },
     {
-      "collectionGroup": "materials",
+      "collectionGroup": "shipments",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "subjectId", "order": "ASCENDING" },
+        { "fieldPath": "productId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "shipmentId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "shipmentDocuments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "shipmentId", "order": "ASCENDING" },
         { "fieldPath": "uploadedAt", "order": "DESCENDING" }
       ]
     },
     {
-      "collectionGroup": "assignments",
+      "collectionGroup": "inventoryAuditLogs",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "subjectId", "order": "ASCENDING" },
-        { "fieldPath": "deadline", "order": "ASCENDING" }
+        { "fieldPath": "productId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
     },
     {
-      "collectionGroup": "topics",
+      "collectionGroup": "deliveryTasks",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "subjectId", "order": "ASCENDING" },
-        { "fieldPath": "order", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "announcements",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "sharedMaterials",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "uploadedAt", "order": "DESCENDING" }
+        { "fieldPath": "assignedRole", "order": "ASCENDING" },
+        { "fieldPath": "dueDate", "order": "ASCENDING" }
       ]
     }
   ],
   "fieldOverrides": []
 }
-
