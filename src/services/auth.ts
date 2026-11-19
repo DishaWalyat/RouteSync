@@ -61,7 +61,11 @@ export async function register(
 
 export async function login(email: string, password: string) {
   const cred = await signInWithEmailAndPassword(getFirebaseAuth(), email, password)
-  await ensureUserProfile(cred.user)
+  try {
+    await ensureUserProfile(cred.user)
+  } catch (err) {
+    console.warn('Non-blocking profile ensure on login:', err)
+  }
   return cred.user
 }
 
@@ -74,18 +78,22 @@ export async function resetPassword(email: string) {
 }
 
 export async function ensureUserProfile(user: User) {
-  const ref = doc(getDb(), 'users', user.uid)
-  const snap = await getDoc(ref)
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      displayName: user.displayName ?? '',
-      email: user.email ?? '',
-      organizationName: 'Primary Partner',
-      phone: '',
-      location: '',
-      role: 'transporter',
-      createdAt: serverTimestamp(),
-    })
+  try {
+    const ref = doc(getDb(), 'users', user.uid)
+    const snap = await getDoc(ref)
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        displayName: user.displayName ?? '',
+        email: user.email ?? '',
+        organizationName: 'Primary Partner',
+        phone: '',
+        location: '',
+        role: 'transporter',
+        createdAt: serverTimestamp(),
+      })
+    }
+  } catch (err) {
+    console.warn('ensureUserProfile non-fatal notice (network/offline fallback):', err)
   }
 }
 
@@ -106,22 +114,27 @@ export async function fetchTokenClaimRole(user: User): Promise<UserRole | null> 
 }
 
 export async function fetchProfile(uid: string): Promise<UserProfile | null> {
-  const snap = await getDoc(doc(getDb(), 'users', uid))
-  if (!snap.exists()) return null
-  const data = snap.data()
-  const roleRaw = String(data.role || 'transporter')
-  const role: UserRole = USER_ROLES.includes(roleRaw as UserRole)
-    ? (roleRaw as UserRole)
-    : 'transporter'
+  try {
+    const snap = await getDoc(doc(getDb(), 'users', uid))
+    if (!snap.exists()) return null
+    const data = snap.data()
+    const roleRaw = String(data.role || 'transporter')
+    const role: UserRole = USER_ROLES.includes(roleRaw as UserRole)
+      ? (roleRaw as UserRole)
+      : 'transporter'
 
-  return {
-    displayName: String(data.displayName ?? ''),
-    email: String(data.email ?? ''),
-    organizationName: String(data.organizationName ?? 'Logistics Node'),
-    phone: String(data.phone ?? ''),
-    location: String(data.location ?? ''),
-    role,
-    createdAt: timestampToIso(data.createdAt),
+    return {
+      displayName: String(data.displayName ?? ''),
+      email: String(data.email ?? ''),
+      organizationName: String(data.organizationName ?? 'Logistics Node'),
+      phone: String(data.phone ?? ''),
+      location: String(data.location ?? ''),
+      role,
+      createdAt: timestampToIso(data.createdAt),
+    }
+  } catch (err) {
+    console.warn('fetchProfile non-fatal notice (network/offline fallback):', err)
+    return null
   }
 }
 

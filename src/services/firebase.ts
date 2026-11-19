@@ -1,6 +1,6 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
 import { getAuth, type Auth } from 'firebase/auth'
-import { getFirestore, type Firestore } from 'firebase/firestore'
+import { initializeFirestore, type Firestore } from 'firebase/firestore'
 import { getStorage, type FirebaseStorage } from 'firebase/storage'
 import { getFunctions, type Functions } from 'firebase/functions'
 
@@ -37,7 +37,11 @@ export function getFirebaseAuth() {
 }
 
 export function getDb() {
-  if (!db) db = getFirestore(getApp())
+  if (!db) {
+    db = initializeFirestore(getApp(), {
+      experimentalAutoDetectLongPolling: true,
+    })
+  }
   return db
 }
 
